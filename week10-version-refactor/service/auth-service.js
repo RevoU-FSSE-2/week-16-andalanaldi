@@ -1,6 +1,7 @@
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const { JWT_SIGN } = require('../config/jwt.js')
+// const { verify } = require('jsonwebtoken');
 const NodeCache = require('node-cache')
 const { uuid }  = require('uuid-v4');
 
@@ -129,6 +130,7 @@ const login = async (req, res) => {
 
 const refreshAccessToken = async (req, res, next) => {
   const refreshToken = req.cookies.refresh_token;
+  console.log(refreshToken, "refreshtoken");
 
   if (!refreshToken) {
     return res.status(401).json({
@@ -137,10 +139,13 @@ const refreshAccessToken = async (req, res, next) => {
     })
   }
 
+  if (!JWT_SIGN) throw new Error('JWT_SIGN is not defined')
+  const decodedRefreshToken = jwt.verify(refreshToken, JWT_SIGN)
+  console.log(JWT_SIGN, "jwtsign")
+  res.status(200)
+//decodedRefreshToken
+
   try {
-    if (!JWT_SIGN) throw new Error('JWT_SIGN is not defined')
-    const decodedRefreshToken = jwt.verify(refreshToken, JWT_SIGN)
-    console.log(decodedRefreshToken)
     if (
       !decodedRefreshToken || !decodedRefreshToken.exp 
     ) {
@@ -159,7 +164,7 @@ const refreshAccessToken = async (req, res, next) => {
       }
     }
 
-    const accessToken= sign({userId: decodedRefreshToken.userId}, JWT_SIGN, {
+    const accessToken= jwt.sign({userId: decodedRefreshToken.userId}, JWT_SIGN, {
       expiresIn: "10m",
     })
 

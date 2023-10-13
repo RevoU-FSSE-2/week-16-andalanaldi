@@ -128,7 +128,6 @@ const login = async (req, res) => {
 }
 
 const refreshAccessToken = async (req, res, next) => {
-  const { db } = req
   const refreshToken = req.cookies.refresh_token;
 
   if (!refreshToken) {
@@ -193,8 +192,7 @@ const logout = async (req, res, next) => {
   }
 };
 
-const requestResetPassword = async (req, res, next) => {
-  const { db } = req;
+const requestResetPassword = async (req, res) => {
   const { username } = req.body;
 
   try {
@@ -224,7 +222,6 @@ const requestResetPassword = async (req, res, next) => {
 };
 
 const resetPassword = async (req, res, next) => {
-  const { db } = req;
   const { token } = req.query;
   const { newPassword } = req.body;
 

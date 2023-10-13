@@ -140,7 +140,7 @@ const refreshAccessToken = async (req, res, next) => {
   try {
     if (!JWT_SIGN) throw new Error('JWT_SIGN is not defined')
     const decodedRefreshToken = jwt.verify(refreshToken, JWT_SIGN)
-
+    console.log(decodedRefreshToken)
     if (
       !decodedRefreshToken || !decodedRefreshToken.exp 
     ) {
@@ -159,7 +159,7 @@ const refreshAccessToken = async (req, res, next) => {
       }
     }
 
-    const accessToken= sign({userId: decodedRefreshToken.userId}. JWT_SIGN, {
+    const accessToken= sign({userId: decodedRefreshToken.userId}, JWT_SIGN, {
       expiresIn: "10m",
     })
 

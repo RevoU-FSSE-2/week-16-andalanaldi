@@ -1,0 +1,202 @@
+openapi: 3.0.0
+info:
+  title: 'Transfer Request Management API'
+  version: 1.0.0
+  description: 'API for managing transfer requests with RBAC'
+servers:
+  - url: http://localhost:3000
+    description: 'Development server'
+components:
+  securitySchemes:
+    bearer:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: 'Bearer with JWT token'
+  schemas:
+    RegisterUser:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+          minLength: 8
+        role:
+          type: string
+      required:
+        - "username"
+        - "password"
+    LoginUser:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+    BadRequest:
+      type: object
+      properties:
+        error:
+          type: string
+    TransferRequest:
+      type: object
+      properties:
+        username:
+          type: string
+        transfer:
+          type: string
+        nominal:
+          type: number
+        status:
+          type: string
+      required:
+        - "username"
+        - "transfer"
+        - "nominal"
+        - "status"
+paths:
+    /auth/register:
+      post:
+        summary: Register new user
+        requestBody:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegisterUser'
+        responses:
+          '200':
+            description: User Created
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    message:
+                      type: string
+                    data:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        username:
+                          type: string
+                        role:
+                          type: string
+          '400':
+            description: 'Bad Request'
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/BadRequest'
+    /auth/login:
+      post:
+        summary: 'Login user'
+        requestBody:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginUser'
+        responses:
+          '200':
+            description: 'Login Success'
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    message:
+                      type: string
+                    data:
+                      type: string
+          '400':
+            description: 'Bad Request'
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/BadRequest'
+    /trans:
+      get:
+        security:
+          - bearer: []
+        summary: 'Get all transfer requests'
+        responses:
+          '200':
+            description: 'Get all transfer requests'
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    message:
+                      type: string
+                    data:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/TransferRequest'
+      post: # Add this section for creating a transfer request
+        security:
+          - bearer: []
+        summary: 'Create a new transfer request'
+        requestBody:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransferRequest'
+        responses:
+          '200':
+            description: 'Transfer request created successfully'
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    message:
+                      type: string
+                    data:
+                      $ref: '#/components/schemas/TransferRequest'
+          '400':
+            description: 'Bad Request'
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/BadRequest'
+      put: # Add this section for updating the status of a transfer request
+        security:
+          - bearer: []
+        summary: 'Update the status of a transfer request'
+        parameters:
+          - in: query
+            name: id
+            schema:
+              type: string
+            required: true
+            description: 'The ID of the transfer request to update'
+        requestBody:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                required:
+                  - "status"
+        responses:
+          '200':
+            description: 'Transfer request status updated successfully'
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    message:
+                      type: string
+                    data:
+                      $ref: '#/components/schemas/TransferRequest'
+          '400':
+            description: 'Bad Request'
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/BadRequest'

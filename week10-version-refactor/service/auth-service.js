@@ -43,10 +43,22 @@ const login = async (req, res) => {
     const isPasswordCorrect = await bcrypt.compare(password, user.password) 
     
     if (isPasswordCorrect) {
-      const token = jwt.sign({ username: user.username, id: user._id, role: user.role }, JWT_SIGN)
+      const expireAt = Math.floor(Date.now() / 1000) + (60 * 60) //change
+      const token = jwt.sign(
+        { username: user.username, id: user._id, role: user.role }, 
+        JWT_SIGN, { expiresIn: expireAt } //change
+      );
+      const refreshToken = jwt.sign(
+        { username: user.username, id: user._id, role: user.role },
+        JWT_SIGN, {expiresIn: '7d'}
+      );
       res.status(200).json({
         message: 'User successfully logged in',
-        data: token
+        data: {
+            token: token,
+            refreshToken: refreshToken, //change
+            expireAt: expireAt //change
+        }
       })
     } else {
       res.status(400).json({ error: 'Password is incorrect' })

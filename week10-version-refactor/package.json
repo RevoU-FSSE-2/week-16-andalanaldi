@@ -1,8 +1,8 @@
 {
-  "name": "authentication-example",
+  "name": "authentication-example-advance",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "nodemon app.js",
@@ -18,11 +18,20 @@
     "express-openapi-validator": "^5.0.6",
     "jsonwebtoken": "^9.0.1",
     "mongodb": "^5.8.1",
+    "node-cache": "^5.1.2",
+    "node-fetch": "^3.3.2",
+    "nodemailer": "^6.9.6",
     "pnpm": "^8.7.0",
     "swagger-ui-express": "^5.0.0",
+    "uuid": "^9.0.1",
+    "uuid-v4": "^0.1.0",
     "yaml": "^2.3.2"
   },
   "devDependencies": {
     "nodemon": "^3.0.1"
+  },
+  "compilerOptions": {
+    "module": "commonjs",
+    "type": "module"
   }
 }

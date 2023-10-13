@@ -1,26 +1,48 @@
+const { JWT_SIGN } = require('../config/jwt');
+const { verify } = require('jsonwebtoken');
+const jwt = require("jsonwebtoken")
 
 const getAllTrans = async (req, res) => {
-  try {
-      const transCollection = req.db.collection('trans-reqw10');
-      const trans = await transCollection.find().toArray();
+    const accessToken = req.cookies.access_token
 
-      res.status(200).json({
-          message: 'Transfers successfully retrieved',
-          data: trans,
-      });
-  } catch (error) {
-      res.status(500).json({ error: error.message });
-  }
-};
+    try {
+        if (!JWT_SIGN) throw new Error("JWT_SIGN is not defined");
+
+        const accessTokenPayload = verify(accessToken, JWT_SIGN);
+
+        let query = { username: accessTokenPayload.username }
+
+        if (
+            accessTokenPayload.role === "maker" ||
+            accessTokenPayload.role === "approver"
+          ) {
+            query = {};
+          }
+
+        const transCollection = req.db.collection('trans-reqw10');
+        const trans = await transCollection.find().toArray();
+
+        res.status(200).json({
+            message: 'Transfers successfully retrieved',
+            data: trans,
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+    };
 
 const createTrans = async (req, res) => {
   const { username, transfer, nominal, status } = req.body;
+  const accessToken = req.cookies.access_token;
 
   console.log(username, transfer, nominal, status, '<=== trans ===>');
 
   try {
+      const decodedToken = jwt.verify(accessToken, JWT_SIGN);
+      const currentUser = decodedToken.username;
+
       const transCollection = req.db.collection('trans-reqw10');
-      const newTrans = await transCollection.insertOne({ username, transfer, nominal, status });
+      const newTrans = await transCollection.insertOne({ username: currentUser, transfer, nominal, status });
 
       res.status(200).json({
           message: 'Transfer request successfully created',

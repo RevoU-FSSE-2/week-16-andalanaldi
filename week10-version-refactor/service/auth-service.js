@@ -2,10 +2,8 @@ const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const { JWT_SIGN } = require('../config/jwt.js')
 const NodeCache = require('node-cache')
-// const { addDays } = require("date-fns");
 const { uuid }  = require('uuid-v4');
 
-// const validRoles = ["maker", "approver"];
 const failedLoginAttemptsCache = new NodeCache({ stdTTL: 600 });
 const cacheKey = new NodeCache({ stdTTL: 300 });
 
@@ -14,8 +12,6 @@ const cacheKey = new NodeCache({ stdTTL: 300 });
 const register = async (req, res) => {
   const { username, password, role } = req.body
 
-  // const userCollection = req.usersCollection;
-
   try {
       if (!['maker', 'approver'].includes(role)) {
           throw new Error('Role must be "maker" or "approver"')
@@ -23,13 +19,6 @@ const register = async (req, res) => {
       if (!username.trim()) {
           throw new Error('Username cannot be blank')
       }
-      // if (!validRoles.includes(role)) {
-      //   throw new Error('Invalid role');
-      // }
-      // const existingUser = await userCollection.findOne({ username });
-      // if (existingUser) {
-      //     throw new Error('Username is already taken');
-      // }
       if (password.length < 8 || !/^(?=.*\d)(?=.*[a-zA-Z]).+$/.test(password)) {
           throw new Error('Password must be at least 8 characters and contain both letters and numbers')
       }
@@ -54,7 +43,6 @@ const register = async (req, res) => {
 
 
 const login = async (req, res) => {
-    // const { usersCollection } = req;
     const { username, password } = req.body
 
     const loginAttempts = failedLoginAttemptsCache.get(username) || 1;
@@ -77,7 +65,6 @@ const login = async (req, res) => {
           status: 401,
         });
       } 
-      // console.log(user, '<=== user ===>');
 
       const isPasswordCorrect = await bcrypt.compare(password, user.password) 
     

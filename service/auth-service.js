@@ -129,8 +129,8 @@ const login = async (req, res) => {
 }
 
 const refreshAccessToken = async (req, res, next) => {
-  const refreshToken = req.cookies.refresh_token;
-  console.log(refreshToken, "refreshtoken");
+  const refreshToken = req.cookies['refreshToken'];
+  console.log(refreshToken, "refreshToken");
 
   if (!refreshToken) {
     return res.status(401).json({

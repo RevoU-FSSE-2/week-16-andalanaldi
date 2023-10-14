@@ -129,7 +129,7 @@ const login = async (req, res) => {
 }
 
 const refreshAccessToken = async (req, res, next) => {
-  const refreshToken = req.cookies['refreshToken'];
+  const refreshToken = req.cookies?.refreshToken;
   console.log(refreshToken, "refreshToken");
 
   if (!refreshToken) {

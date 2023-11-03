@@ -4,9 +4,9 @@ const authorizationMiddleware = require('../middleware/authorization-middleware.
 
 const transRouter = Router()
 
-transRouter.get('/trans', authorizationMiddleware, getAllTrans)
-transRouter.post('/trans/new', authorizationMiddleware, createTrans)
-transRouter.put('/trans/:id', authorizationMiddleware, approvalTrans)
-transRouter.delete('/trans/del/:id', authorizationMiddleware, deleteTrans)
+transRouter.get('/', authorizationMiddleware, getAllTrans)
+transRouter.post('/new', authorizationMiddleware, createTrans)
+transRouter.put('/:id', authorizationMiddleware, approvalTrans)
+transRouter.delete('/del/:id', authorizationMiddleware, deleteTrans)
 
 module.exports = transRouter

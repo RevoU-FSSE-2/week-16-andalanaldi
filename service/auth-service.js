@@ -2,6 +2,7 @@ const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const { JWT_SIGN } = require('../config/jwt.js')
 // const { verify } = require('jsonwebtoken');
+const { addDays } = require("date-fns")
 const NodeCache = require('node-cache')
 const { v4: uuidv4 }  = require('uuid');
 
@@ -9,7 +10,7 @@ const validRoles = ["maker", "approver"];
 const failedLoginAttemptsCache = new NodeCache({ stdTTL: 600 });
 const cacheKey = new NodeCache({ stdTTL: 300 });
 
-
+const cookie = require('cookie')
 // Modify register function to enforce role, non-blank username, and password requirements
 const register = async (req, res) => {
 
@@ -174,7 +175,10 @@ const login = async (req, res) => {
 }
 
 const refreshAccessToken = async (req, res, next) => {
-  const refreshToken = req.cookies?.refresh_token;
+  const rawCookies = req.headers.cookie || ''
+  const cookies = cookie.parse(rawCookies)
+  const refreshToken = cookies.refresh_token
+  // const refreshToken = req.cookies?.refresh_token;
   console.log(refreshToken, "refresh_token");
 
   if (!refreshToken) {

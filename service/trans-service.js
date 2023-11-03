@@ -2,10 +2,13 @@ const { ObjectId } = require('mongodb');
 const { JWT_SIGN } = require('../config/jwt');
 const { verify } = require('jsonwebtoken');
 const jwt = require("jsonwebtoken")
-
+const cookie = require('cookie')
 async function createTrans(req, res) {
   const { username, transfer, nominal, status } = req.body;
-  const accessToken = req.cookies.access_token;
+  const rawCookies = req.headers.cookie || ''
+  const cookies = cookie.parse(rawCookies)
+  const accessToken = cookies.access_token
+  //   const accessToken = req.cookies.access_token
   console.log(username, transfer, nominal, status, '<=== trans ===>');
   try {
       const decodedToken = jwt.verify(accessToken, JWT_SIGN);
@@ -20,7 +23,7 @@ async function createTrans(req, res) {
          });
          return;
       }
-      const newTrans = await req.transsCollection.insertOne({
+      const newTrans = await req.transCollection.insertOne({
         username: currentUser,
         transfer,
         nominal,
@@ -43,7 +46,10 @@ async function createTrans(req, res) {
 };
 
 async function getAllTrans(req, res) {
-    const accessToken = req.cookies.access_token
+    const rawCookies = req.headers.cookie || ''
+    const cookies = cookie.parse(rawCookies)
+    const accessToken = cookies.access_token
+    // const accessToken = req.cookies.access_token
 
     try {
         if (!JWT_SIGN) throw new Error("JWT_SIGN is not defined");
@@ -85,7 +91,10 @@ async function getAllTrans(req, res) {
 async function approvalTrans(req, res) {
   const id = req.params.id
   const { username, status } = req.body;
-  const token = req.cookies.access_token;
+  const rawCookies = req.headers.cookie || ''
+  const cookies = cookie.parse(rawCookies)
+  const token = cookies.access_token
+  //   const token = req.cookies.access_token;
   console.log(id, status, '<=== trans ===>');
 
   try {
@@ -100,26 +109,26 @@ async function approvalTrans(req, res) {
       }
       const decodedToken = jwt.verify(token, JWT_SIGN);
       console.log('Decoded Token:', decodedToken);
-      const currentUser = decodedToken.username;
-      const userRole = decodedToken.role;
+    //   const currentUser = decodedToken.username;
+    //   const userRole = decodedToken.role;
       
-      const getTrans = await req.transCollection.findOne(
-        { _id: new ObjectId(id) }, // MongoDB's default ObjectId is used as assumed
-      );
+    //   const getTrans = await req.transCollection.findOne(
+    //     { _id: new ObjectId(id) }, // MongoDB's default ObjectId is used as assumed
+    //   );
 
-      if (!getTrans) {
-        res.status(401).json({
-            message: "Unauthorized: Transaction request is not found or does not belong to the current maker"
-        });
-        return;
-      }
+    //   if (!getTrans) {
+    //     res.status(401).json({
+    //         message: "Unauthorized: Transaction request is not found or does not belong to the current maker"
+    //     });
+    //     return;
+    //   }
 
-      if (userRole === "approver" && getTrans.username !== currentUser) {
-        res.status(401).json({
-            message: "Unauthorized: You are not the maker of this transaction request"
-        });
-        return;
-    }
+    //   if (userRole === "approver" && getTrans.username !== currentUser) {
+    //     res.status(401).json({
+    //         message: "Unauthorized: You are not the approver of this transaction request"
+    //     });
+    //     return;
+    //   }
 
       //   const transCollection = req.db.collection('trans-reqw10');
       const updatedTrans = await req.transCollection.updateOne(
@@ -166,7 +175,10 @@ async function approvalTrans(req, res) {
 
 async function deleteTrans(req, res) {
     const { id } = req.params;
-    const token = req.cookies.access_token
+    const rawCookies = req.headers.cookie || ''
+    const cookies = cookie.parse(rawCookies)
+    const token = cookies.access_token
+    // const token = req.cookies.access_token
 
 try {
     const decodedToken = jwt.verify(token, JWT_SIGN)
